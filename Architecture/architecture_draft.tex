@@ -283,7 +283,7 @@ The framework follows a three-layer architecture: an \textbf{input layer} for de
     \draw[data flow] (orchestrator) -- (statemgr);
 
     % ── Output Layer ──
-    \node[output file, below=1.5cm of costctrl] (declog) {Decision\\Log (JSONL)};
+    \node[output file] (declog) at ([yshift=-2.5cm]statemgr.south -| costctrl.center) {Decision\\Log (JSONL)};
     \node[output file, right=0.5cm of declog] (costlog) {Cost \&\\Token Log};
     \node[output file, right=0.5cm of costlog] (manifest) {Reproducibility\\Manifest};
 
@@ -297,7 +297,7 @@ The framework follows a three-layer architecture: an \textbf{input layer} for de
               label={[layer label=accentgreen]above:OUTPUT LAYER}] (outputlayer) {};
     \end{scope}
 
-    \draw[data flow=accentgreen] (statemgr.south) -- ++(0,-0.5) -| (costlog.north);
+    \draw[data flow=accentgreen] (statemgr.south) -- ++(0,-1.5) -| (costlog.north);
 
 \end{tikzpicture}
 \caption{High-level three-layer architecture of the simulation framework.}

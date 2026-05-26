@@ -200,87 +200,87 @@ The framework follows a \textbf{three-layer architecture}: an input layer for de
 
 \begin{figure}[H]
 \centering
-\begin{tikzpicture}[
-    node distance=0.6cm and 0.6cm,
-    inputbox/.style={rectangle, draw=accentblue!70, fill=inputcolor, rounded corners=2pt,
-                     minimum height=1cm, minimum width=2.6cm, align=center, font=\small\sffamily},
-    corebox/.style={rectangle, draw=accentorange!70, fill=corecolor, rounded corners=2pt,
-                    minimum height=1cm, minimum width=2.6cm, align=center, font=\small\sffamily},
-    outbox/.style={rectangle, draw=accentgreen!70, fill=outputcolor, rounded corners=2pt,
-                   minimum height=1cm, minimum width=2.6cm, align=center, font=\small\sffamily},
-    layerframe/.style={rectangle, draw=#1!50, fill=#1!4, rounded corners=5pt, inner sep=10pt, line width=0.8pt},
-    arr/.style={-{Stealth[length=5pt]}, thick},
-    dualarr/.style={{Stealth[length=4pt]}-{Stealth[length=4pt]}, thick},
+\begin{tikzpicture}[node distance=0.6cm and 0.8cm,
+    component/.style={rectangle, draw=compborder, fill=compbg, rounded corners=3pt,
+                      minimum height=1cm, minimum width=2.8cm, align=center, font=\small\sffamily},
+    layer box/.style={rectangle, draw=#1!60!black, fill=#1!8,
+                      rounded corners=5pt, inner sep=10pt, line width=1pt},
+    layer label/.style={font=\small\sffamily\bfseries, text=#1!60!black},
+    data flow/.style={-{Stealth[length=6pt]}, thick, color=#1!60!black},
+    data flow/.default={black},
+    bidirectional/.style={{Stealth[length=5pt]}-{Stealth[length=5pt]}, thick, color=#1!60!black},
+    bidirectional/.default={black},
+    input file/.style={rectangle, draw=accentblue!70, fill=inputcolor,
+                       rounded corners=2pt, minimum height=0.9cm,
+                       minimum width=2.4cm, align=center, font=\small\sffamily},
+    output file/.style={rectangle, draw=accentgreen!70, fill=outputcolor,
+                        rounded corners=2pt, minimum height=0.9cm,
+                        minimum width=2.4cm, align=center, font=\small\sffamily},
+    process/.style={rectangle, draw=accentorange!70, fill=corecolor,
+                    rounded corners=2pt, minimum height=0.9cm,
+                    minimum width=2.4cm, align=center, font=\small\sffamily},
 ]
-    % ── Coordinates: 3-column grid ──
-    \def\colA{0}
-    \def\colB{3.4}
-    \def\colC{6.8}
 
-    % ── INPUT LAYER ──
-    \node[inputbox] (sc)  at (\colA, 0)     {Scenario\\(YAML)};
-    \node[inputbox] (pe)  at (\colB, 0)     {Personas\\(YAML)};
-    \node[inputbox] (rc)  at (\colC, 0)     {Run Config\\(YAML)};
-    \node[inputbox, minimum width=3.2cm] (val) at (\colB, -1.4) {Schema Validator};
+    % ── Input Layer ──
+    \node[input file] (scenario) {Scenario\\Definition};
+    \node[input file, right=0.5cm of scenario] (personas) {Persona\\Definitions};
+    \node[input file, right=0.5cm of personas] (runconfig) {Run Config\\(LLM, Budget)};
+
+    \node[process, below=0.5cm of personas, minimum width=3cm] (validator) {Schema Validator};
 
     \begin{scope}[on background layer]
-        \node[layerframe=accentblue, fit=(sc)(pe)(rc)(val),
-              label={[font=\small\sffamily\bfseries, text=accentblue]above:INPUT LAYER}] {};
+        \node[layer box=accentblue, fit=(scenario)(personas)(runconfig)(validator),
+              label={[layer label=accentblue]above:INPUT LAYER}] (inputlayer) {};
     \end{scope}
 
-    % Arrows: converge to validator
-    \draw[arr, accentblue!70] (sc.south) -- ([yshift=3pt]val.north-|sc) -- (val.north-|val.west);
-    \draw[arr, accentblue!70] (pe.south) -- (val.north);
-    \draw[arr, accentblue!70] (rc.south) -- ([yshift=3pt]val.north-|rc) -- (val.north-|val.east);
+    \draw[data flow=accentblue] (scenario.south) -- (validator);
+    \draw[data flow=accentblue] (personas.south) -- (validator);
+    \draw[data flow=accentblue] (runconfig.south) -- (validator);
 
-    % ── CORE ENGINE ──
-    \node[corebox] (se)   at (\colA, -3.4)  {Scenario\\Engine};
-    \node[corebox] (pm)   at (\colB, -3.4)  {Persona\\Manager};
-    \node[corebox] (pr)   at (\colC, -3.4)  {Prompt\\Engine};
+    % ── Core Engine ──
+    \node[component, below=1.5cm of validator] (sceneng) {Scenario\\Engine};
+    \node[component, right=0.4cm of sceneng] (persmgr) {Persona\\Manager};
+    \node[component, right=0.4cm of persmgr] (prompteng) {Prompt\\Engine};
 
-    \node[corebox] (cc)   at (\colA, -4.8)  {Cost\\Controller};
-    \node[corebox] (orch) at (\colB, -4.8)  {Orchestrator};
-    \node[corebox] (gw)   at (\colC, -4.8)  {LLM\\Gateway};
+    \node[component, below=0.6cm of sceneng] (costctrl) {Cost\\Controller};
+    \node[component, right=0.4cm of costctrl] (orchestrator) {Interaction\\Orchestrator};
+    \node[component, right=0.4cm of orchestrator] (llmgw) {LLM\\Gateway};
 
-    \node[corebox, minimum width=2.6cm] (st) at (\colB, -6.2) {State Manager};
+    \node[component, below=0.6cm of orchestrator] (statemgr) {State\\Manager};
 
     \begin{scope}[on background layer]
-        \node[layerframe=accentorange, fit=(se)(pm)(pr)(cc)(orch)(gw)(st),
-              label={[font=\small\sffamily\bfseries, text=accentorange]above:CORE ENGINE}] {};
+        \node[layer box=accentorange,
+              fit=(sceneng)(persmgr)(prompteng)(costctrl)(orchestrator)(llmgw)(statemgr),
+              label={[layer label=accentorange]above:CORE ENGINE}] (corelayer) {};
     \end{scope}
 
-    % Core arrows: top row
-    \draw[arr] (se) -- (pm);
-    \draw[arr] (pm) -- (pr);
+    \draw[data flow] (validator) -- (sceneng);
+    \draw[data flow] (sceneng) -- (persmgr);
+    \draw[data flow] (persmgr) -- (prompteng);
+    \draw[data flow] (prompteng) -- (llmgw);
+    \draw[bidirectional] (costctrl) -- (orchestrator);
+    \draw[bidirectional] (orchestrator) -- (llmgw);
+    \draw[data flow] (orchestrator) -- (statemgr);
 
-    % Core arrows: vertical connections
-    \draw[arr] (pr) -- (gw);
+    % ── Output Layer ──
+    \node[output file] (declog) at ([yshift=-2.5cm]statemgr.south -| costctrl.center) {Decision\\Log (JSONL)};
+    \node[output file, right=0.5cm of declog] (costlog) {Cost \&\\Token Log};
+    \node[output file, right=0.5cm of costlog] (manifest) {Reproducibility\\Manifest};
 
-    % Core arrows: middle row
-    \draw[dualarr] (cc) -- (orch);
-    \draw[dualarr] (orch) -- (gw);
-
-    % Core arrows: to state
-    \draw[arr] (orch) -- (st);
-
-    % Validator to Scenario Engine
-    \draw[arr] (val.south) -- (se.north);
-
-    % ── OUTPUT LAYER ──
-    \node[outbox] (dl) at (\colA, -8.0) {Decision\\Log};
-    \node[outbox] (cl) at (\colB, -8.0) {Cost\\Log};
-    \node[outbox] (mn) at (\colC, -8.0) {Manifest\\+ Summary};
+    \node[output file, below=0.4cm of declog] (analysis) {Analysis\\Artifacts};
+    \node[output file, right=0.5cm of analysis] (rawresp) {Raw LLM\\Responses};
+    \node[output file, right=0.5cm of rawresp] (summary) {Run\\Summary};
 
     \begin{scope}[on background layer]
-        \node[layerframe=accentgreen, fit=(dl)(cl)(mn),
-              label={[font=\small\sffamily\bfseries, text=accentgreen]above:OUTPUT LAYER}] {};
+        \node[layer box=accentgreen,
+              fit=(declog)(costlog)(manifest)(analysis)(rawresp)(summary),
+              label={[layer label=accentgreen]above:OUTPUT LAYER}] (outputlayer) {};
     \end{scope}
 
-    % State to output
-    \draw[arr, accentgreen!70] (st) -- (cl);
+    \draw[data flow=accentgreen] (statemgr.south) -- ++(0,-1.5) -| (costlog.north);
 
 \end{tikzpicture}
-\caption{Three-layer framework architecture.}
+\caption{High-level three-layer architecture of the simulation framework.}
 \label{fig:arch}
 \end{figure}
 

@@ -121,13 +121,13 @@ The goal of this thesis is the design, implementation, and evaluation of an end-
 \subsection*{Sub-Questions}
 
 \begin{description}[style=nextline, leftmargin=1.5cm]
-    \item[RQ1 (Efficiency)] Which prompt engineering and API optimization strategies significantly reduce per-simulation costs without compromising the quality of agent decisions?
+    \item[RQ1 (Cost Optimization --- Core)] Which specific optimization strategies (structured output, prompt compression, model routing, response caching, local models) reduce per-simulation costs, and what is their individual and cumulative impact on cost and decision quality?
 
-    \item[RQ2 (Architecture)] How must the framework architecture be designed so that different stakeholder scenarios (negotiation, iterative game, multi-stakeholder conflict) can be modeled through configuration changes alone?
+    \item[RQ2 (Cost--Quality Tradeoff)] What is the relationship between cost reduction and result quality across optimization strategies? Is there a cost--quality sweet spot where significant savings can be achieved with minimal quality degradation?
 
-    \item[RQ3 (Validity)] Do the simulated agents produce plausible, consistent decisions in the context of known game-theoretic scenarios and a real-world use case (peatland rewetting)? How sensitive are results to model choice, temperature, and prompt variations?
+    \item[RQ3 (Architecture)] How must the framework architecture be designed so that different stakeholder scenarios (negotiation, iterative game, multi-stakeholder conflict) can be modeled through configuration changes alone, with optimization strategies switchable via configuration?
 
-    \item[RQ4 (Scalability)] How do cost and runtime scale with the number of agents, rounds, and scenario complexity, and which architectural decisions influence this?
+    \item[RQ4 (Validity \& Reproducibility)] As a necessary precondition for meaningful cost comparisons: Do LLM-based agents produce sufficiently plausible and reproducible decisions, and how sensitive are results to model choice, temperature, and prompt variations?
 \end{description}
 
 % ══════════════════════════════════════════════════════════
@@ -164,11 +164,20 @@ Implementation in Python with a focus on extensibility and testability. A detail
 
 \subsubsection*{Phase~3 --- Evaluation}
 \begin{itemize}
-    \item \textbf{Application scenario}: Simulation of the peatland rewetting negotiation with diverse farmer personas and incentive mechanisms. Qualitative analysis of agent decisions for plausibility and consistency.
-    \item \textbf{Benchmark scenarios}: Prisoner's Dilemma, Ultimatum Game, Public Goods Game. Comparison with theoretical equilibria to validate agent quality.
-    \item \textbf{Cost comparison}: Measurement of API costs (tokens, \$) with vs.\ without optimizations over identical scenarios.
-    \item \textbf{Sensitivity analysis}: Variation of model, temperature, prompt strategy, and cohort sizes.
-    \item \textbf{Reproducibility test}: Repetition of identical configurations and statistical evaluation of variance.
+    \item \textbf{Waterfall cost experiment (central)}: Incremental activation of optimization strategies on a fixed baseline scenario. Each stage measures cost reduction (\%) and quality delta relative to the unoptimized baseline:
+    \begin{enumerate}[label=Stage~\arabic*:, leftmargin=2cm]
+        \item Baseline (full context, GPT-4o, free-text output, no caching)
+        \item + Structured output (JSON mode)
+        \item + Prompt compression (sliding window / history summarization)
+        \item + Model routing (cheap model for simple rounds)
+        \item + Response caching (SHA-256 prompt hashing)
+        \item + Local models (Ollama) for selected sub-tasks
+    \end{enumerate}
+    Result: an empirical \textbf{cost--quality tradeoff curve} across $N{=}10$ repetitions per stage.
+    \item \textbf{Model comparison}: Same scenario across GPT-4o, GPT-4o-mini, Claude Sonnet, Mistral Large, and Llama-3 (local). Cost, quality, and latency per model.
+    \item \textbf{Application scenario}: Peatland rewetting negotiation with diverse farmer personas and incentive mechanisms. Plausibility analysis of agent decisions.
+    \item \textbf{Reproducibility test}: 30 runs with identical configuration at varying temperature levels ($t{=}0.0, 0.3, 0.7$). Statistical evaluation of result variance.
+    \item \textbf{(Optional) Benchmark validation}: Ultimatum Game and Prisoner's Dilemma with known equilibria as a sanity check.
 \end{itemize}
 
 \subsection{Evaluation Criteria}
@@ -454,12 +463,12 @@ The framework is demonstrated and evaluated using a concrete use case from clima
 
     \item \textbf{Evaluation}
     \begin{enumerate}[label=\arabic{enumi}.\arabic*]
-        \item Experimental setup
+        \item Experimental setup and metrics
+        \item Waterfall cost experiment: cumulative optimization impact
+        \item Cost--quality tradeoff analysis
+        \item Model comparison: cost-performance across providers
         \item Use case: peatland rewetting simulation
-        \item Benchmark results: validity in game-theoretic scenarios
-        \item Cost analysis: optimized vs.\ baseline
-        \item Performance benchmarks: latency and throughput
-        \item Reproducibility analysis
+        \item Reproducibility and sensitivity analysis
         \item Discussion and limitations
     \end{enumerate}
 
@@ -490,13 +499,13 @@ The framework is demonstrated and evaluated using a concrete use case from clima
             & Architecture design, schema design, technology selection \\
         3.\ Implementation
             & Month 3--5
-            & Core framework, persona modeling, LLM integration, cost optimizations, tests \\
+            & Core framework, persona modeling, LLM integration, cost optimization strategies (each as config-switchable feature), tests \\
         4.\ Evaluation
             & Month 4--5
-            & Peatland scenario simulation, benchmark experiments, cost comparisons, sensitivity analyses \\
+            & Waterfall cost experiment, model comparison, peatland simulation, reproducibility tests \\
         5.\ Writing
-            & Month 5--6
-            & Writing, review, revision \\
+            & Month 2--6
+            & Continuous writing from Month~2 (design chapter first); main writing phase Month~5--6 \\
         \bottomrule
     \end{tabularx}
     \caption{Preliminary timeline (assumption: 6-month thesis period).}
@@ -509,8 +518,8 @@ The framework is demonstrated and evaluated using a concrete use case from clima
 
 \begin{enumerate}
     \item \textbf{Practical contribution}: An open-source framework enabling researchers to run multi-stakeholder simulations via declarative configuration, demonstrated with the peatland rewetting use case.
-    \item \textbf{Scientific contribution}: Systematic evaluation of cost optimization strategies for LLM agent systems with quantitative benchmarks.
-    \item \textbf{Methodological contribution}: Design patterns and best practices for reproducible LLM-based experimental simulations, including a declarative persona schema.
+    \item \textbf{Scientific contribution}: Empirical cost--quality tradeoff analysis across five optimization strategies, quantifying their individual and cumulative impact on simulation cost and result quality (waterfall experiment).
+    \item \textbf{Methodological contribution}: Design patterns and best practices for reproducible, cost-efficient LLM-based experimental simulations, including a declarative persona schema and configurable optimization pipeline.
     \item \textbf{Application contribution}: Exploratory results on which incentive mechanisms lead to acceptance of rewetting measures among different farmer types.
 \end{enumerate}
 
@@ -552,8 +561,9 @@ Design Science in Information Systems Research.
 \textit{MIS Quarterly}, 28(1), 75--105.
 
 \bibitem{teubner2025}
-Teubner, T. \& Camacho, S. (2025).
-[Reference for gift-exchange studies with LLMs].
+Teubner, T., Flath, C.\,M. \& Weinhardt, C. (2025).
+LLM-Based Agents in Economic Experiments: Methodological Insights from Gift-Exchange Games.
+\textit{Working Paper}, Paderborn University.
 
 \bibitem{chen2023}
 Chen, L., Zaharia, M. \& Zou, J. (2023).

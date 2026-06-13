@@ -1,0 +1,49 @@
+scenario:
+  id: "minimal-negotiation"
+  version: "1.0"
+  name: "Minimal Test Scenario"
+  description: "Two agents negotiate a simple deal"
+  shared_context: >
+    A buyer and a seller are negotiating the price of a product.
+    The product is worth between 50 and 150 EUR.
+
+  roles:
+    - id: "buyer"
+      label: "Buyer"
+      description: "Wants to buy the product at the lowest price"
+      count: 1
+      persona_pool: "minimal_agents.yaml"
+    - id: "seller"
+      label: "Seller"
+      description: "Wants to sell the product at the highest price"
+      count: 1
+      persona_pool: "minimal_agents.yaml"
+
+  interaction:
+    type: "multi_round_negotiation"
+    topology: "all_to_all"
+    rounds:
+      min: 1
+      max: 3
+    turn_order: "sequential"
+    visibility:
+      decisions: true
+      reasoning: false
+      history_depth: "full"
+
+  incentives:
+    - id: "price_offer"
+      label: "Price Offer"
+      type: "continuous"
+      range: [50, 150]
+      unit: "EUR"
+      offered_by: "buyer"
+      target: "seller"
+
+  objectives:
+    - id: "final_price"
+      description: "The agreed price"
+      aggregation: "mean"
+    - id: "deal_reached"
+      description: "Whether a deal was reached"
+      aggregation: "ratio"

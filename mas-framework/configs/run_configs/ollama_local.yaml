@@ -1,0 +1,26 @@
+id: "ollama-gemma4"
+seed: 42
+repetitions: 1
+description: "Local Ollama run with Gemma 4"
+
+llm:
+  default_provider: "ollama"
+  default_model: "ollama/gemma4:latest"
+  temperature: 0.7
+  max_tokens_per_response: 512
+  response_format: "json"
+  providers:
+    ollama:
+      base_url: "http://localhost:11434"
+
+cost:
+  budget_total_usd: 0.0
+  abort_on_exceed: false
+
+caching:
+  enabled: false
+
+output:
+  base_dir: "output/runs"
+  include_raw_responses: true
+  log_level: "DEBUG"

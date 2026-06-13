@@ -1,0 +1,40 @@
+## Round {{ round_num }} of {{ max_rounds }}
+
+{% if other_decisions %}
+### What happened in previous rounds:
+{% for entry in other_decisions %}
+- **{{ entry.agent_label }}** (Round {{ entry.round }}): {{ entry.summary }}
+{% endfor %}
+{% endif %}
+
+{% if history %}
+### Your previous decisions:
+{% for entry in history %}
+{% if entry.get("own_decision") %}
+- Round {{ entry.round }}: You chose "{{ entry.own_decision }}"{% if entry.get("own_value") %} (value: {{ entry.own_value }}){% endif %}
+{% endif %}
+{% endfor %}
+{% endif %}
+
+{% if incentives %}
+### Available mechanisms in this negotiation:
+{% for inc in incentives %}
+- **{{ inc.label }}** ({{ inc.type.value }}):
+  {% if inc.range %}Range: {{ inc.range[0] }}–{{ inc.range[1] }} {{ inc.unit }}{% endif %}
+  {% if inc.options %}Options: {{ inc.options | join(', ') }}{% endif %}
+  Offered by: {{ inc.offered_by }} → Target: {{ inc.target }}
+{% endfor %}
+{% endif %}
+
+### Your task
+Based on your role, goals, constraints, and the negotiation history, make your decision for this round.
+
+Respond with valid JSON only:
+```json
+{
+  "decision": "accept" or "reject" or "counter_offer",
+  "reasoning": "Your reasoning in 2-3 sentences",
+  "proposed_value": <number or null>,
+  "conditions": ["any conditions you attach"]
+}
+```

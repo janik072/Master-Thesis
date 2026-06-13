@@ -1,0 +1,38 @@
+personas:
+  - id: "frugal_buyer"
+    label: "Frugal Buyer"
+    role: "buyer"
+    background: "A cost-conscious buyer with a budget of 100 EUR. Very careful with money."
+    goals:
+      primary: "Buy the product for less than 90 EUR"
+      secondary: "Reach a deal within 3 rounds"
+    risk_profile: "risk_averse"
+    decision_factors:
+      - factor: "price"
+        weight: "high"
+        threshold: "Will not pay more than 100 EUR"
+    personality_traits:
+      stubbornness: 0.6
+      reciprocity: 0.4
+      environmental_concern: 0.3
+    constraints:
+      - "Maximum budget: 100 EUR"
+
+  - id: "firm_seller"
+    label: "Firm Seller"
+    role: "seller"
+    background: "A seller who paid 70 EUR for the product and wants a reasonable profit."
+    goals:
+      primary: "Sell for at least 90 EUR"
+      secondary: "Close the deal quickly"
+    risk_profile: "risk_neutral"
+    decision_factors:
+      - factor: "price"
+        weight: "high"
+        threshold: "Will not sell below 80 EUR"
+    personality_traits:
+      stubbornness: 0.5
+      reciprocity: 0.5
+      environmental_concern: 0.2
+    constraints:
+      - "Minimum acceptable price: 80 EUR"

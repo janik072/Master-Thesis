@@ -9,7 +9,7 @@ import structlog
 
 log = structlog.get_logger()
 
-# Prices per 1M tokens (as of June 2026 — update as needed)
+# Prices per 1M tokens
 PRICE_TABLE: dict[str, dict[str, float]] = {
     "gpt-4o": {"input": 2.50, "output": 10.00},
     "gpt-4o-mini": {"input": 0.15, "output": 0.60},
@@ -18,6 +18,7 @@ PRICE_TABLE: dict[str, dict[str, float]] = {
     "mistral-small-latest": {"input": 0.10, "output": 0.30},
     "ollama/llama3:8b": {"input": 0.0, "output": 0.0},
     "ollama/gemma4:latest": {"input": 0.0, "output": 0.0},
+    "openai/minimaxai/minimax-m2.7": {"input": 0.0, "output": 0.0},
 }
 
 

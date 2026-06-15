@@ -58,6 +58,7 @@ async def run_simulation(resolved: ResolvedScenario) -> Path:
                     agent, resolved, round_num, history, other_decisions
                 )
 
+
                 messages = [
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt},

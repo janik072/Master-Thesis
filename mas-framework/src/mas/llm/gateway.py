@@ -61,11 +61,15 @@ class LLMGateway:
 
         start = time.perf_counter()
 
-        # Resolve base_url from provider config
+        # Resolve base_url and api_key from provider config
         api_base = None
+        api_key = None
         provider_name = self.config.default_provider
         if provider_name in self.config.providers:
-            api_base = self.config.providers[provider_name].base_url
+            provider_cfg = self.config.providers[provider_name]
+            api_base = provider_cfg.base_url
+            if provider_cfg.api_key_env:
+                api_key = os.environ.get(provider_cfg.api_key_env)
 
         try:
             kwargs: dict = {
@@ -76,6 +80,8 @@ class LLMGateway:
             }
             if api_base:
                 kwargs["api_base"] = api_base
+            if api_key:
+                kwargs["api_key"] = api_key
             if self.config.response_format.value == "json":
                 kwargs["response_format"] = {"type": "json_object"}
 

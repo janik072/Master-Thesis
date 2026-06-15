@@ -1,0 +1,24 @@
+id: "minimaxai/minimax-m2.7"
+seed: 42
+description: "minimax2.7 via NVIDIA API"
+
+llm:
+  default_provider: "nvidia"
+  default_model: "openai/minimaxai/minimax-m2.7"   
+  temperature: 1.0
+  max_tokens_per_response: 512
+  response_format: "json"
+  providers:
+    nvidia:
+      api_key_env: "NVIDIA_API_KEY"                       
+      base_url: "https://integrate.api.nvidia.com/v1"     
+
+cost:
+  budget_total_usd: 1.00
+  abort_on_exceed: true
+
+caching:
+  enabled: false
+
+output:
+  base_dir: "output/runs"

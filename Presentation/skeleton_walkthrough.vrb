@@ -1,0 +1,59 @@
+\frametitle{Projektstruktur}
+
+\begin{columns}[T]
+\begin{column}{0.55\textwidth}
+\begin{lstlisting}[language={}, basicstyle=\ttfamily\tiny]
+mas-framework/
+  configs/
+    scenarios/minimal.yaml
+    personas/minimal_agents.yaml
+    run_configs/dev.yaml
+    run_configs/ollama_local.yaml
+  src/mas/
+    cli.py           <- Einstieg
+    schemas/         <- Pydantic-Modelle
+      scenario.py
+      persona.py
+      run_config.py
+      resolved.py
+    engine/          <- Simulationslogik
+      scenario_engine.py
+      orchestrator.py
+      state.py
+    prompts/         <- Prompt-Generierung
+      engine.py
+      templates/system.j2
+      templates/user_decision.j2
+    llm/             <- LLM-Anbindung
+      gateway.py
+      cost.py
+    output/          <- Ergebnis-Export
+      writer.py
+  tests/             <- 16 Unit-Tests
+  output/runs/       <- Ergebnisse
+\end{lstlisting}
+\end{column}
+
+\begin{column}{0.42\textwidth}
+\small
+\textbf{Kennzahlen:}
+\begin{itemize}
+    \item {\raise.17ex\hbox{$\scriptstyle\sim$}}900 Zeilen Python
+    \item {\raise.17ex\hbox{$\scriptstyle\sim$}}90 Zeilen Jinja2
+    \item {\raise.17ex\hbox{$\scriptstyle\sim$}}140 Zeilen YAML
+    \item 16 Unit-Tests
+    \item 14 Python-Module
+\end{itemize}
+
+\vspace{0.4cm}
+\textbf{Technologien:}
+\begin{itemize}
+    \item Pydantic v2 (Validierung)
+    \item Jinja2 (Templates)
+    \item litellm (LLM-Abstraktion)
+    \item Typer (CLI)
+    \item asyncio (non-blocking)
+\end{itemize}
+\end{column}
+\end{columns}
+
